@@ -36,6 +36,7 @@
     "electron": "^38.1.2",
     "electron-builder": "^26.0.12"
   },
+
   "build": {
     "appId": "com.ponygorx.orderprinter",
     "protocols": {
@@ -45,11 +46,55 @@
       ]
     },
     "mac": {
+      "icon": "assets/icon.icns",
       "category": "public.app-category.utilities",
       "target": [
-        "dmg",
-        "zip"
+        {
+          "target": "default",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "artifactName": "${productName}.${ext}",
+      "type": "distribution",
+      "hardenedRuntime": true,
+      "entitlements": "assets/entitlements.mac.plist",
+      "entitlementsInherit": "assets/entitlements.mac.plist",
+      "gatekeeperAssess": false,
+      "publish": ["github"]
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
       ]
-    }
-  }
+    },
+    "directories": {
+
+      "buildResources": "assets"
+
+    },
+    "extraResources": [
+      "./assets/**"
+    ]
+
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WangHuiAndDaben/ponygorx-order-printer.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WangHuiAndDaben/ponygorx-order-printer/issues"
+  },
+  "homepage": "https://github.com/WangHuiAndDaben/ponygorx-order-printer#readme"
 }

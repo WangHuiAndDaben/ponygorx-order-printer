@@ -7,11 +7,14 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch: # 允许手动触发
-
+# 添加权限配置
+permissions:
+  contents: write
+  packages: write
 jobs:
   build-macos:
+    timeout-minutes: 30
     runs-on: macos-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,26 +25,24 @@ jobs:
           node-version: '22.19.0'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: npm install
+        run: |
+          npm install
 
-      - name: Install Apple certificate
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: apple-actions/import-codesign-certs@v2
+
+      - uses: nick-fields/retry@v2
+        name: Build Electron app for macOS
         with:
-          p12-file-base64: ${{ secrets.APPLE_P12_CERTIFICATE }}
-          p12-password: ${{ secrets.APPLE_P12_PASSWORD }}
-          keychain: temp
-          team-id: ${{ secrets.TEAM_ID }}
-      - name: Build Electron app for macOS
-        run: npm run build:mac
+          timeout_minutes: 30
+          max_attempts: 2
+          #command: npm run build:mac
+          command: npm run build:mac:universal
         env:
-          # 如果需要代码签名，取消注释并添加secrets
-          CSC_LINK:  ${{ secrets.APPLE_P12_CERTIFICATE }}
-          CSC_KEY_PASSWORD: ${{ secrets.APPLE_P12_PASSWORD }}
-          APPLE_ID:
-          APPLE_ID_PASSWORD:
-          ASC_PROVIDER: 
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

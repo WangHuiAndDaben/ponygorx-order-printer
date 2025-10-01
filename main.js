@@ -162,25 +162,24 @@ function getSumatraPath() {
  // alert(app.isPackaged); //alert
   if (app.isPackaged) {
     // 生产环境：假设我们使用 asarUnpack 将 pdf-to-print 解压到了 app.asar.unpacked
-   // sumatraPath = path.join(process.resourcesPath, 'app.asar.unpacked', 'node_modules', 'pdf-to-printer','dist', 'SumatraPDF-3.4.6-32.exe');
-   //
-
-    sumatraPath = path.join(process.resourcesPath, 'app.asar.unpacked', 'assets', 'SumatraPDF-3.4.6-32.exe');
+    sumatraPath = path.join(process.resourcesPath, 'app.asar.unpacked', 'node_modules', 'pdf-to-printer','dist', 'SumatraPDF-3.4.6-32.exe');
+   // sumatraPath = path.join(process.resourcesPath, 'app.asar.unpacked', 'assets', 'SumatraPDF-3.4.6-32.exe');
 
     console.log('SumatraPDF 路径:', sumatraPath); // 确保这里输出的是正确的编码
     // 或者如果使用 extraResource 复制到了 resources 目录下
     // sumatraPath = path.join(process.resourcesPath, 'SumatraPDF-3.4.6-32.exe');
-    //alert(sumatraPath+"SumatraPDF 路径:");
     // 检查文件是否存在
     if (!fs.existsSync(sumatraPath)) {
       // 如果不在上述路径，可能被打包到了其他位置，需要根据实际调整
       // 可以尝试多个路径
-      sumatraPath = path.join(__dirname, 'assets', 'SumatraPDF-3.4.6-32.exe');
+     // sumatraPath = path.join(__dirname, 'assets', 'SumatraPDF-3.4.6-32.exe');
+      sumatraPath = path.join(__dirname,  'node_modules', 'pdf-to-printer','dist','SumatraPDF-3.4.6-32.exe');
     }
   } else {
     // 开发环境 node_modules\pdf-to-printer\dist
     //D:\order-printer\node_modules\pdf-to-printer\dist
-    sumatraPath = path.join(__dirname,  'assets','SumatraPDF-3.4.6-32.exe');
+   // sumatraPath = path.join(__dirname,  'assets','SumatraPDF-3.4.6-32.exe');
+    sumatraPath = path.join(__dirname,  'node_modules', 'pdf-to-printer','dist','SumatraPDF-3.4.6-32.exe');
     console.log('SumatraPDF 路径开发环境===:', sumatraPath);
   }
 
