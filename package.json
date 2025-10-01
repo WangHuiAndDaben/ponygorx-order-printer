@@ -1,0 +1,55 @@
+{
+  "name": "ponygorx-order-printer",
+  "productName": "ponygorx-order-printer",
+  "description": "Order printer for ponygorx",
+  "keywords": [],
+  "main": "./main.js",
+  "version": "1.0.0",
+  "author": "ponygorx",
+  "scripts": {
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:mac:universal": "electron-builder --mac --universal --publish always",
+    "dist": "electron-builder --mac --publish never"
+  },
+  "dependencies": {
+    "@electron-forge/publisher-github": "7.9.0",
+    "electron-squirrel-startup": "^1.0.1",
+    "express": "^5.1.0",
+    "iconv-lite": "0.6.3",
+    "pdf-to-printer": "^5.6.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.9.0",
+    "@electron-forge/maker-deb": "^7.9.0",
+    "@electron-forge/maker-dmg": "^7.9.0",
+    "@electron-forge/maker-rpm": "^7.9.0",
+    "@electron-forge/maker-squirrel": "^7.9.0",
+    "@electron-forge/maker-zip": "^7.9.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.9.0",
+    "@electron-forge/plugin-fuses": "^7.9.0",
+    "@electron/fuses": "^1.8.0",
+    "@felixrieseberg/electron-forge-maker-nsis": "^7.2.0",
+    "electron": "^38.1.2",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.ponygorx.orderprinter",
+    "protocols": {
+      "name": "ponygorxorderprinter",
+      "schemes": [
+        "ponygorxorderprinter"
+      ]
+    },
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    }
+  }
+}

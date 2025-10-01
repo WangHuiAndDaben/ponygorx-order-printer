@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PonyGo Order Printing Component</title>
+    <style>
+        #print-button{
+            background-color: #c41a02; /* 红色背景 */
+            color: white; /* 白色字体 */
+            padding: 5px 25px; /* 内边距 */
+            border: 2px solid  #c41a02; /* 去掉默认边框 */
+            border-radius: 5px; /* 圆角 */
+            font-size: 0.8em; /* 字体大小 */
+            cursor: pointer; /* 鼠标悬停时显示手型指针 */
+            transition: background-color 0.3s ease; /* 平滑过渡效果 */
+            font-weight: bold;
+            /* 鼠标悬停时改变背景颜色 */
+            &:hover {
+                background-color: white;
+                color: #c41a02;
+                outline: none; /* 去掉默认的聚焦轮廓 */
+
+            }
+        }
+        #printer-select{
+            font-size:0.9em;
+        }
+    </style>
+</head>
+<body>
+<h1>Order SN：<span id="order-id">Currently no print jobs pending</span></h1>
+<h1>
+    <input type="hidden" id="pdf-url" value="">
+    <label for="printer-select">Select Printer:</label>
+    <select id="printer-select"></select>
+</h1>
+<h1>
+    <button id="print-button">Print</button>
+</h1>
+<!--<h1>Result：<span id="printer-result"></span></h1>-->
+<!--<div>
+    <label for="printer-select">选择打印机:</label>
+    <select id="printer-select"></select>
+</div>
+<div id="url-display">测试数据=====</div>
+<button id="print-button">打印PDF文件</button>-->
+<script src="renderer.js"></script>
+</body>
+</html>

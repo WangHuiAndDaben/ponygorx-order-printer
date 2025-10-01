@@ -1,0 +1,64 @@
+name: Build Electron App for macOS
+
+on:
+  push:
+    tags:
+      - 'v*' # 在推送版本标签时触发，例如 v1.0.0
+  pull_request:
+    branches: [main]
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.19.0'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Apple certificate
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: apple-actions/import-codesign-certs@v2
+        with:
+          p12-file-base64: ${{ secrets.APPLE_P12_CERTIFICATE }}
+          p12-password: ${{ secrets.APPLE_P12_PASSWORD }}
+          keychain: temp
+          team-id: ${{ secrets.TEAM_ID }}
+      - name: Build Electron app for macOS
+        run: npm run build:mac
+        env:
+          # 如果需要代码签名，取消注释并添加secrets
+          CSC_LINK:  ${{ secrets.APPLE_P12_CERTIFICATE }}
+          CSC_KEY_PASSWORD: ${{ secrets.APPLE_P12_PASSWORD }}
+          APPLE_ID:
+          APPLE_ID_PASSWORD:
+          ASC_PROVIDER: 
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: |
+            dist/*.dmg
+            dist/*.zip
+          retention-days: 30
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/*.dmg
+            dist/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
