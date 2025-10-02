@@ -46,7 +46,7 @@ function createWindow() {
   // 注册自定义 URL 协议
   app.setAsDefaultProtocolClient('ponygorxorderprinter', process.execPath);
   // 打开开发者工具
-  //  mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
@@ -101,16 +101,25 @@ ipcMain.on('get-printers', (event) => {
         }
       }
     } else {
-      // 解析 Linux/macOS 命令输出
+     /* // 解析 Linux/macOS 命令输出
       const lines = stdout.trim().split('\n');
       for (const line of lines) {
         const match = line.match(/printer (.+?) is/);
         if (match) {
           printers.push({ name: match[1] });
         }
-      }
+      }*/
+          // 将Buffer转换为字符串
+          const output = stdout.toString();  // 添加这行来转换Buffer到字符串
+          // 解析 Linux/macOS 命令输出
+          const lines = output.trim().split('\n');
+          for (const line of lines) {
+            const printerName = line.trim();
+            if (printerName) {
+              printers.push({ name: printerName });
+            }
+          }
     }
-
     event.reply('printers-list', printers);
   });
 });

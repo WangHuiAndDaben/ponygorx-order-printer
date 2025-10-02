@@ -60,7 +60,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
 });*/
 ipcRenderer.on('protocol-url', (event, sn,pdfUrl) => {
-    alert(sn+"==============="+pdfUrl+"===============");
+  //  alert(sn+"==============="+pdfUrl+"===============");
     const urlElement = document.getElementById('order-id');
     if (urlElement) {
         urlElement.innerHTML = `${sn}`;
