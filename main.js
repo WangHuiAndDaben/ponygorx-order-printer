@@ -70,6 +70,7 @@ app.whenReady().then(() => {
 ipcMain.on('get-printers', (event) => {
   console.log('Getting printers...获取打印机=====');
   let command;
+  let printers = [];
   if (process.platform === 'win32') {// Windows 平台
     command = 'powershell -NoProfile -Command "$OutputEncoding = [System.Text.Encoding]::UTF8; Get-Printer | Select-Object -ExpandProperty Name"';
     exec(command, {encoding: 'buffer' }, (error, stdout, stderr) => {
@@ -78,7 +79,7 @@ ipcMain.on('get-printers', (event) => {
         event.reply('printers-list', []);
         return;
       }
-      let printers = [];
+
       // 使用iconv-lite将输出从GBK（中文系统默认）转换为UTF-8
       const decodedOutput = iconv.decode(stdout, 'gbk');
       // 解析 PowerShell 命令输出
@@ -93,13 +94,17 @@ ipcMain.on('get-printers', (event) => {
     });
   } else if (process.platform === 'darwin') { // macOS 平台
       const { getPrinters} = require('unix-print');
-      getPrinters().then((res)=>
-        (printers) => {
-          console.log('macOS 打印机列表:', printers);
-          event.reply('printers-list', printers);
-        }
+      getPrinters().then(
+          (res)=>{
+                console.log('macOS 打印机列表:', res);
+                event.reply('printers-list-macos', res);
+                res.forEach(resItem => {
+                    printers.push({ name: resItem });
+                });
+          }
       );
-  //  command = 'system_profiler SPPrintersDataType -xml | grep -A 1 "_name" | grep string | sed "s/.*<string>\\(.*\\)<\\/string>.*/\\1/"';
+      event.reply('printers-list', printers);
+      //  command = 'system_profiler SPPrintersDataType -xml | grep -A 1 "_name" | grep string | sed "s/.*<string>\\(.*\\)<\\/string>.*/\\1/"';
   } /*else {
     // Linux 平台
     command = 'lpstat -p';

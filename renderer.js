@@ -3,6 +3,7 @@ const { ipcRenderer } = require('electron');
 // 获取打印机列表
 ipcRenderer.send('get-printers');
 ipcRenderer.on('printers-list', (event, printers) => {
+    console.log('打印机列表printers-list:', printers);
     const printerSelect = document.getElementById('printer-select');
     printerSelect.innerHTML = ''; // 清空之前的选项
     //创建一个空的option元素
@@ -16,6 +17,15 @@ ipcRenderer.on('printers-list', (event, printers) => {
         option.textContent = printer.name;
         printerSelect.appendChild(option);
     });
+});
+
+ipcRenderer.on('printers-list-macos', (event, printers) => {
+   /* if (result.success) {
+        alert(result.message);
+    } else {
+        alert(result.message);
+    }*/
+    console.log('macOS 打印机列表:', printers);
 });
 
 // 打印按钮点击事件
@@ -40,6 +50,9 @@ ipcRenderer.on('print-result', (event, result) => {
         alert(result.message);
     }
 });
+
+
+
 
 // 确保页面加载完成后发送打印准备信号
 window.addEventListener('DOMContentLoaded', (event) => {
