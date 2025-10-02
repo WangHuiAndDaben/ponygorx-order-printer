@@ -99,11 +99,12 @@ ipcMain.on('get-printers', (event) => {
                 console.log('macOS 打印机列表:', res);
                 event.reply('printers-list-macos', res);
                 res.forEach(resItem => {
-                    printers.push({ name: resItem });
+                    printers.push({ name:resItem.printer});
                 });
+                event.reply('printers-list', printers);
           }
       );
-      event.reply('printers-list', printers);
+
       //  command = 'system_profiler SPPrintersDataType -xml | grep -A 1 "_name" | grep string | sed "s/.*<string>\\(.*\\)<\\/string>.*/\\1/"';
   } /*else {
     // Linux 平台
