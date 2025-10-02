@@ -3,7 +3,7 @@ name: Build Electron App for macOS
 on:
   push:
     tags:
-      - 'v*' # 在推送版本标签时触发，例如 v1.0.0
+      - 'v*' # 在推送版本标签时触发，例如 v1.0.0 #如何发布新的版本APP,存在了release 标签,然后需要删除release 标签,再重新发布
   pull_request:
     branches: [main]
   workflow_dispatch: # 允许手动触发

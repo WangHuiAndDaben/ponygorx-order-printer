@@ -166,6 +166,11 @@ async function downloadPDF(url) {
 function getSumatraPath() {
   let sumatraPath;
 
+  ///判断平台系统 如果是苹果电脑直接返回 null
+  if (process.platform === 'darwin') {
+    return null;
+  }
+
   //SumatraPDF-3.4.6-32.exe
   console.log('app.isPackaged:', app.isPackaged);
  // alert(app.isPackaged); //alert
@@ -213,7 +218,7 @@ async function printNetworkPDF(pdfUrl, options = {}) {
     },
     scale:'noscale',
     orientation: 'landscape',
-    sumatraPdfPath: sumatraPath
+    sumatraPdfPath: sumatraPath ///如果是苹果电脑还需要这个吗？？？？
   }
   console.log("临时文件",tempFilePath);
   print(tempFilePath,printOptions).then(
@@ -240,7 +245,6 @@ ipcMain.on('print-network-pdf', async (event, pdfUrl, options = {}) => {
   try {
     // 下载PDF到临时文件
     const tempFilePath = await downloadPDF(pdfUrl);
-    const sumatraPath = getSumatraPath();
     // 设置打印选项
     const printOptions = {
       printer: options.printer || '',
@@ -249,9 +253,17 @@ ipcMain.on('print-network-pdf', async (event, pdfUrl, options = {}) => {
         height: 51 // 单位：毫米
       },
       scale:'noscale',
-      orientation: 'landscape',
-      sumatraPdfPath: sumatraPath
+      orientation: 'landscape'
+     // sumatraPdfPath: sumatraPath
     }
+    //如果不是苹果系统 则需要添加 sumatraPdfPath
+    if (process.platform !== 'darwin') {
+      const sumatraPath = getSumatraPath();
+      printOptions.sumatraPdfPath = sumatraPath;
+    }
+
+
+
     console.log("临时文件",tempFilePath);
     print(tempFilePath,printOptions).then(
         (res)=>{
