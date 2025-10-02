@@ -1,0 +1,13 @@
+Actions=PlayPause;Next;Previous
+
+[Desktop Action PlayPause]
+Name=Play-Pause
+Exec=audacious -t
+
+[Desktop Action Next]
+Name=Next
+Exec=audacious -f
+
+[Desktop Action Previous]
+Name=Previous
+Exec=audacious -r

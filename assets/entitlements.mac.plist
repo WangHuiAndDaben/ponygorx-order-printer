@@ -21,5 +21,11 @@
     <!-- Uncomment to allow read and write access to the user's Downloads directory -->
     <!-- <key>com.apple.security.files.downloads.read-write</key>
     <true/> -->
+
+
+    <key>com.apple.security.printing</key>
+    <true/>
+
+
   </dict>
 </plist>
