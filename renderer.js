@@ -56,7 +56,7 @@ ipcRenderer.on('print-result', (event, result) => {
 
 // 确保页面加载完成后发送打印准备信号
 window.addEventListener('DOMContentLoaded', (event) => {
-    ipcRenderer.send('print-ready');
+    //ipcRenderer.send('print-ready');
 });
 
 // 在渲染进程中，我们可以通过暴露的API监听协议链接

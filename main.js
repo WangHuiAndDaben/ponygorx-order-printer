@@ -40,10 +40,16 @@ function createWindow() {
     // expose window controls in Windows/Linux
     ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {})*/
   });
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show()
+  });
+  mainWindow.on('closed', () => {
+    mainWindow = null; // 确保 mainWindow 被设置为 null，避免后续操作
+  });
   // 加载你的应用
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
   mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send('print-ready');
+    //mainWindow.webContents.send('print-ready');
   });
   // 注册自定义 URL 协议
   app.setAsDefaultProtocolClient('ponygorxorderprinter', process.execPath);
@@ -260,12 +266,8 @@ ipcMain.on('print-network-pdf', async (event, pdfUrl, options = {}) => {
         }
     }
   } catch (error) {
- //  console.error('打印网络PDF失败:', error)
-   // return { success: false, error: error.message }
     event.reply('print-result', { success: false, message: '打印网络PDF失败: ' + error.message });
   }
-
-
 });
 
 
@@ -275,20 +277,21 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
-
-
-
-
 // 在macOS上，我们使用`open-url`事件
 app.on('open-url', (event, url) => {
     event.preventDefault();
   const parsedUrl = new URL(url);
   const pdfUrl = parsedUrl.searchParams.get('pdfUrl');
   const sn = parsedUrl.searchParams.get('sn');
+  if(parsedUrl.searchParams.get('size')){
+    printSize=parsedUrl.searchParams.get('size');
+  }
     // 确保我们有一个窗口来显示内容
-    if (mainWindow) {
-      // 如果窗口已经存在，我们可以将url发送给渲染进程进行处理
-      mainWindow.webContents.send('protocol-url', sn,pdfUrl);
+    if (mainWindow && !mainWindow.isDestroyed()) { //如何判断窗口是否加载完成
+         // 如果窗口已经存在，并且完全加载完成，我们可以将url发送给渲染进程进行处理
+        mainWindow.webContents.once('did-finish-load', () => {
+          mainWindow.webContents.send('protocol-url',sn,pdfUrl);
+        });
     } else {
       // 如果窗口不存在，我们可以先存储url，等窗口创建后再发送
       // 这里我们简单处理，直接发送给渲染进程，但要注意渲染进程可能还未准备好
@@ -305,17 +308,15 @@ app.on('open-url', (event, url) => {
 app.on('second-instance', (event, commandLine, workingDirectory) => {
   // 命令参数中可能包含协议链接
   console.log('second-instance', commandLine, workingDirectory);
-
-
   // 在Windows上，协议链接可能是命令行的一个参数
   const url = commandLine.find(arg => arg.startsWith('ponygorxorderprinter://'));
   if (url) {
     const parsedUrl = new URL(url);
     const pdfUrl = parsedUrl.searchParams.get('pdfUrl');
     const sn = parsedUrl.searchParams.get('sn');
-    const size=parsedUrl.searchParams.get('size');
-    printSize=size;
-   // printNetworkPDF(pdfUrl,{printer:printerSelect});
+    if(parsedUrl.searchParams.get('size')){
+      printSize=parsedUrl.searchParams.get('size');
+    }
     // 我们可以存储这个url，等窗口创建后发送
     // 这里我们等待窗口创建后发送
     if (mainWindow) {
@@ -350,8 +351,9 @@ if (process.platform !== 'darwin') {
       const parsedUrl = new URL(url);
       const pdfUrl = parsedUrl.searchParams.get('pdfUrl');
       const sn = parsedUrl.searchParams.get('sn');
-      const size=parsedUrl.searchParams.get('size');
-      printSize=size;
+      if(parsedUrl.searchParams.get('size')){
+        printSize=parsedUrl.searchParams.get('size');
+      }
       console.log("pdfUrl:", pdfUrl);
      // printNetworkPDF(pdfUrl,{printer:printerSelect});
       // 我们可以存储这个url，等窗口创建后发送
