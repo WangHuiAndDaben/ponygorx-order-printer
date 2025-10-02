@@ -4,7 +4,7 @@
   "description": "Order printer for ponygorx",
   "keywords": [],
   "main": "./main.js",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "author": "ponygorx",
   "scripts": {
     "start": "electron-forge start",
@@ -56,7 +56,7 @@
           ]
         }
       ],
-      "artifactName": "${productName}.${ext}",
+      "artifactName": "${productName}-${version}.${ext}",
       "type": "distribution",
       "hardenedRuntime": true,
       "entitlements": "assets/entitlements.mac.plist",
