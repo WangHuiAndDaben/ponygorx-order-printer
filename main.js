@@ -209,9 +209,10 @@ ipcMain.on('print-network-pdf', async (event, pdfUrl, options = {}) => {
         }
         if( printSize==="big"){
           printOptions.paperSize = {
-            width:152, // 单位：毫米
-            height: 102 // 单位：毫米
+            width:102, // 单位：毫米
+            height: 152  // 单位：毫米
           };
+          printOptions.orientation='portrait';
         }
         console.log("临时文件",tempFilePath);
         print(tempFilePath,printOptions).then(
@@ -229,10 +230,11 @@ ipcMain.on('print-network-pdf', async (event, pdfUrl, options = {}) => {
           console.error('打印错误:', error);
           event.reply('print-result', { success: false, message: '打印失败: ' + error });
         });
-    }else{
+    }
+    else{
         let optionsMacOS = ["-o landscape",  "-o media=Custom.4x2in"];
         if( printSize==="big"){
-           optionsMacOS = ["-o landscape",  "-o media=Custom.4x6in"];
+           optionsMacOS = ["-o portrait",  "-o media=Custom.4x6in"];
         }
         const { print,isPrintComplete} = require('unix-print');
         try {
@@ -244,6 +246,12 @@ ipcMain.on('print-network-pdf', async (event, pdfUrl, options = {}) => {
               await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
             }
             event.reply('print-result', { success: true, message: '打印成功MacOS' });
+            setTimeout(() => {// 打印完成后删除临时文件（延迟删除确保打印完成）
+              if (fs.existsSync(tempFilePath)) {
+                fs.unlinkSync(tempFilePath)
+                console.log('临时文件已删除')
+              }
+            }, 10000) // 10秒后删除
             console.log('Job complete');
           }
           await waitForPrintCompletion(printJob);
