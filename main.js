@@ -29,16 +29,11 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 400,
-   // icon: '/path/to/icon.png'
     icon: path.join(__dirname, 'assets', 'icon.png'), // 添加窗口图标
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-     // preload: path.join(__dirname, 'preload.js'), // 预加载脚本
     },
-    /* titleBarStyle: 'hidden',
-    // expose window controls in Windows/Linux
-    ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {})*/
   });
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
@@ -48,13 +43,10 @@ function createWindow() {
   });
   // 加载你的应用
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
-  mainWindow.webContents.on('did-finish-load', () => {
-    //mainWindow.webContents.send('print-ready');
-  });
   // 注册自定义 URL 协议
   app.setAsDefaultProtocolClient('ponygorxorderprinter', process.execPath);
   // 打开开发者工具
-  mainWindow.webContents.openDevTools();
+ // mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
@@ -68,12 +60,7 @@ app.whenReady().then(() => {
   })
 })
 
-
-
-
-
-
-ipcMain.on('get-printers', (event) => {
+ipcMain.on('get-printers', async (event) => {
   console.log('Getting printers...获取打印机=====');
   let command;
   let printers = [];
@@ -85,7 +72,6 @@ ipcMain.on('get-printers', (event) => {
         event.reply('printers-list', []);
         return;
       }
-
       // 使用iconv-lite将输出从GBK（中文系统默认）转换为UTF-8
       const decodedOutput = iconv.decode(stdout, 'gbk');
       // 解析 PowerShell 命令输出
@@ -99,25 +85,19 @@ ipcMain.on('get-printers', (event) => {
       event.reply('printers-list', printers);
     });
   } else if (process.platform === 'darwin') { // macOS 平台
-      const { getPrinters} = require('unix-print');
-      getPrinters().then(
-          (res)=>{
-                console.log('macOS 打印机列表:', res);
-                event.reply('printers-list-macos', res);
-                res.forEach(resItem => {
-                    printers.push({ name:resItem.printer});
-                });
-                event.reply('printers-list', printers);
-          }
-      );
-
-      //  command = 'system_profiler SPPrintersDataType -xml | grep -A 1 "_name" | grep string | sed "s/.*<string>\\(.*\\)<\\/string>.*/\\1/"';
-  } /*else {
-    // Linux 平台
-    command = 'lpstat -p';
-  }*/
-
-
+    const {getPrinters} = require('unix-print');
+    getPrinters().then(
+        (res) => {
+          console.log('macOS 打印机列表:', res);
+          event.reply('printers-list-macos', res);
+          res.forEach(resItem => {
+            printers.push({name: resItem.printer});
+          });
+          event.reply('printers-list', printers);
+        }
+    );
+    //  command = 'system_profiler SPPrintersDataType -xml | grep -A 1 "_name" | grep string | sed "s/.*<string>\\(.*\\)<\\/string>.*/\\1/"';
+  }
 });
 // 下载网络PDF文件
 async function downloadPDF(url) {
@@ -273,9 +253,10 @@ ipcMain.on('print-network-pdf', async (event, pdfUrl, options = {}) => {
 
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+  /*if (process.platform !== 'darwin') {
     app.quit();
-  }
+  }*/
+  app.quit();
 });
 // 在macOS上，我们使用`open-url`事件
 app.on('open-url', (event, url) => {
@@ -324,15 +305,7 @@ app.on('second-instance', (event, commandLine, workingDirectory) => {
       mainWindow.focus();
       mainWindow.webContents.send('protocol-url',  sn,pdfUrl);
     }
-  /*  if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore();
-      mainWindow.focus();
-      mainWindow.webContents.send('protocol-url', url);
-    }*/
   }
-
-
-
 });
 
 // 对于Windows和Linux，当应用首次启动时，也可能通过命令行参数传递协议链接
