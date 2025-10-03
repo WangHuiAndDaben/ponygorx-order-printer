@@ -1,6 +1,13 @@
 const { ipcRenderer } = require('electron');
 
 // 获取打印机列表
+ipcRenderer.send('get-printer-component-version');
+ipcRenderer.on('printer-component-version', (event, version) => {
+    console.log('打印机组件版本:', version);
+    document.getElementById('printer-version').textContent = version;
+});
+
+
 ipcRenderer.send('get-printers');
 ipcRenderer.on('printers-list', (event, printers) => {
     console.log('打印机列表printers-list:', printers);

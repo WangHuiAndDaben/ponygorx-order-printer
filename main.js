@@ -46,7 +46,7 @@ function createWindow() {
   // 注册自定义 URL 协议
   app.setAsDefaultProtocolClient('ponygorxorderprinter', process.execPath);
   // 打开开发者工具
- // mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
@@ -59,6 +59,13 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
+
+ipcMain.on('get-printer-component-version', async (event) => {
+  event.reply('printer-component-version', 'version '+ app.getVersion());
+  // 打印机组件版本
+  console.log('打印机组件版本:', app.getVersion());
+});
+
 
 ipcMain.on('get-printers', async (event) => {
   console.log('Getting printers...获取打印机=====');
